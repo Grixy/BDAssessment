@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 
 namespace BD_Assessment_WebAPI_Ruan_Gates.Models
 {
-	public class Batch
+	public class NumberInBatch
 	{
 		[Key]
-		public int RequestId { get; set; }
+		public int NumberId { get; set; }
 
-		public int GrandTotal { get; set; }
+		[Required]
+		public int BatchId { get; set; }
 
-		public IList<BatchElement> BatchElements { get; set; }
+		[Required]
+		public int Number { get; set; }
+
+		[Required]
+		public BatchElement BatchElement { get; set; }
 	}
-
-
 }

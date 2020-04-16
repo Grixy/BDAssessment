@@ -1,0 +1,32 @@
+<form #form="ngForm" autocomplete="off" (submit)="onSubmit(form)">
+    <input type="hidden" name="RequestId" [value]="service.formData.RequestId">
+
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <div class="input-group-text bg-white">
+            <i class="far fa-layer-group"  [class.green-icon]="Batches.valid" [class.red-icon]="Batches.invalid && Batches.touched"></i>
+          </div>
+        </div>
+        <input name="Batches" #Batches="ngModel" [(ngModel)]="service.formData.Batches" 
+        class="form-control" placeholder="Batches from 1-10" required maxlength="2" minlength="1">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <div class="input-group-text bg-white">
+            <i class="far fa-list-ol"  [class.green-icon]="Numbers.valid" [class.red-icon]="Numbers.invalid && Numbers.touched"></i>
+          </div>
+        </div>
+        <input name="Numbers" #Numbers="ngModel" [(ngModel)]="service.formData.Numbers" 
+        class="form-control" placeholder="Numbers from 1-10" required maxlength="2" minlength="1">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button class="btn btn-success btn-lg btn-block" type="submit" [disabled]="form.invalid"><i class="fas fa-database"></i> Submit</button>
+    </div>
+
+  </form>
