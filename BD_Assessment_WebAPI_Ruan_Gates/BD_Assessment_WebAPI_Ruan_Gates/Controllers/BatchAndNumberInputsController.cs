@@ -80,83 +80,16 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Controllers
         [HttpPost]
         public async Task<ActionResult<BatchAndNumberInput>> PostBatchAndNumberInput(BatchAndNumberInput batchAndNumberInput)
         {
-            
-
-            var usr = new Batch();
-            
-            usr.BatchElements = new List<BatchElement>();
-
-            BatchElement b = new BatchElement();
-            b.NumbersRemaining = 4;
-            b.Aggregate = 12;
-            b.NumbersInBatch = new List<NumberInBatch>();
-
-            NumberInBatch n = new NumberInBatch();
-            n.Number = 3;
-
-            b.NumbersInBatch.Add(n);
-            usr.BatchElements.Add(b);
-
-            usr.GrandTotal = 123;
-
-            _context.Batches.Add(usr);
-            await _context.SaveChangesAsync();
-
-            //using (var context = new BatchContext())
-            //{
-            //    context.Database.EnsureCreated();
-            //    context.Add(usr);
-            //    context.SaveChanges();
-            //}
-
-            //PostBatch(usr);
-
-            //List<Task> listOfTasks = new List<Task>();
-
-            //foreach (var thing in thingsToLoop)
-            //{
-            //    listOfTasks.Add(DoAsync(thing));
-            //}
-
-            //await Task.WhenAll(listOfTasks);
-
-            int totalBatches = Int32.Parse(batchAndNumberInput.Batches);
-            int totalNumbers = Int32.Parse(batchAndNumberInput.Numbers);
-
-            int remainingNumbers = 0;
-
-            //List<int> batchList = new List<int>();
-
-            //for (int z = 0; z < totalBatches; z++)
-            //{
-
-            //    batchList
-            //}
-
-
-
-
             List<Task<BatchAndNumber>> listOfTasks = new List<Task<BatchAndNumber>>();
-            BatchesAndNumbersProcessor processor = new BatchesAndNumbersProcessor();
+            int totalBatches = Int32.Parse(batchAndNumberInput.Batches);
+            ProcessorAsync processorAsync = new ProcessorAsync();
 
             for (int z = 1; z <= totalBatches; z++)
             {
-                listOfTasks.Add(processor.PerformBatchOperations(z));
+                listOfTasks.Add(processorAsync.PerformBatchOperations(z));
             }
 
             var check = await Task.WhenAll<BatchAndNumber>(listOfTasks);
-
-            //List<int> numbersList = new List<int>();
-
-            //for (int i = 0; i < totalBatches; i++)
-            //{
-            //    for (int j = 0; j < totalNumbers; j++)
-            //    {
-
-            //        var v = await processor.PerformBatchOperations(i, Int32.Parse(batchAndNumberInput.Numbers));
-            //    }
-            //}
-
 
             _context.BatchAndNumberInput.Add(batchAndNumberInput);
             await _context.SaveChangesAsync();

@@ -32,75 +32,20 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			GeneratorManager.NumberGenerated += MultiplierManager.OnNumberGenerated;
 			MultiplierManager.NumberMultiplied += BatchesAndNumbersProcessor.OnNumberMultiplied;
 
-			//for (int i = 0; i < numbers; i++)
 			await GeneratorManager.Generate(batch);
 
-			Console.WriteLine(""+numbertest);
+			Console.WriteLine("" + numbertest);
 			return batchAndNumber;
 		}
 
-		public void OnNumberMultiplied(object source, BatchAndNumberEventArgs e)
+		public async void OnNumberMultiplied(object source, BatchAndNumberEventArgs e)
 		{
 			Console.WriteLine("123" + e.BatchAndNumber.Batch + " " + e.BatchAndNumber.Number);
 			numbertest = e.BatchAndNumber.Number;
 			batchAndNumber.Batch = e.BatchAndNumber.Batch;
 			batchAndNumber.Number = e.BatchAndNumber.Number;
-			//using (var client = new HttpClient())
-
-			//var optionsBuilder = new DbContextOptionsBuilder<BatchContext>();
-			//optionsBuilder.UseSqlServer("DevConnection");
-
-			//using (BatchContext context = new BatchContext(optionsBuilder.Options))
-			//{
-
-			//	Batch batch = new Batch();
-			//	batch.BatchElements = new List<BatchElement>();
-			//	batch.GrandTotal = 444;
-
-			//	BatchElement batchElement = new BatchElement();
-			//	batchElement.Aggregate = 0;
-			//	batchElement.NumbersRemaining = 1;
-			//	batchElement.NumbersInBatch = new List<NumberInBatch>();
-
-			//	NumberInBatch numberInBatch = new NumberInBatch();
-			//	numberInBatch.Number = e.BatchAndNumber.Number;
-
-			//	batchElement.NumbersInBatch.Add(numberInBatch);
-			//	batch.BatchElements.Add(batchElement);
-
-			//	context.Add(batch);
-			//	await context.SaveChangesAsync();
-			//}
-
-			//ReturningValueForDb(batchAndNumber);
-
-			//NumberInBatch numberInBatch = new NumberInBatch();
-			//numberInBatch.Number = e.BatchAndNumber.Number;
-
-			//BatchElement batchElement = new BatchElement();
-			//batchElement.Aggregate = 0;
-			//batchElement.NumbersRemaining = 1;
-			//batchElement.NumbersInBatch = new List<NumberInBatch>();
-			//batchElement.NumbersInBatch.Add(numberInBatch);
-
-			//Batch batch = new Batch();
-			//batch.BatchElements = new List<BatchElement>();
-			//batch.GrandTotal = 444;
-
-			//DbContext.Batches.Add(batch);
-			//await _context.SaveChangesAsync();
 		}
 
-		//public async Task ReturningValueForDb(BatchAndNumber batchAndNumber)
-		//{
-		//	OnReturningBatchElementForDb(batchAndNumber);
-		//}
-
-		//protected virtual void OnReturningBatchElementForDb(BatchAndNumber batchAndNumber)
-		//{
-		//	if (NumberMultiplied != null)
-		//		NumberMultiplied(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
-		//}
 	}
 
 	public class GeneratorManager
@@ -117,7 +62,7 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			batchAndNumber.Batch = batch;
 			batchAndNumber.Number = randomNumber;
 
-			await Task.Delay(randomDelay);
+			await Task.Delay(5000);
 
 			OnNumberGenerated(batchAndNumber);
 		}
@@ -135,7 +80,9 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 		{
 			Console.WriteLine("123" + e.BatchAndNumber.Batch + " " + e.BatchAndNumber.Number);
 
-			await Multiply(e.BatchAndNumber.Batch, e.BatchAndNumber.Number);
+			await Task.Run(() => Multiply(e.BatchAndNumber.Batch, e.BatchAndNumber.Number));
+
+			//await Multiply(e.BatchAndNumber.Batch, e.BatchAndNumber.Number);
 		}
 
 		public event EventHandler<BatchAndNumberEventArgs> NumberMultiplied;
@@ -147,11 +94,11 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			int multiplier = RandomWithinRange.RandomNumber(Global.MultiplierLowest, Global.MultiplierHighest);
 			int multipliedNumber = multiplier * number;
 			int randomDelay = RandomWithinRange.RandomNumber(Global.DelayLowest, Global.DelayHighest, Global.DelayMultiplier);
-			
+
 			batchAndNumber.Batch = batch;
 			batchAndNumber.Number = multipliedNumber;
 
-			await Task.Delay(randomDelay);
+			await Task.Delay(5000);
 
 			OnNumberMultiplied(batchAndNumber);
 		}

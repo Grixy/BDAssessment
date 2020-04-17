@@ -9,8 +9,8 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Helpers
 	{
 		static int RANDOM_INTEGER_LOWEST = 1;
 		static int RANDOM_INTEGER_HIGHEST = 100;
-		static int DELAY_LOWEST = 20;
-		static int DELAY_HIGHEST = 40;
+		static int DELAY_LOWEST = 10;
+		static int DELAY_HIGHEST = 30;
 		static int DELAY_MULTIPLIER = 1000;
 		static int MULTIPLIER_LOWEST = 2;
 		static int MULTIPLIER_HIGHEST = 4;
