@@ -14,6 +14,7 @@ export class NumbersAndBatchesService {
   constructor(private http: HttpClient) { }
 
   postNumbersAndBatches() {
+    // alert("POST");
     return this.http.post(this.rootURL + '/BatchAndNumberInputs', this.formData);
   }
 

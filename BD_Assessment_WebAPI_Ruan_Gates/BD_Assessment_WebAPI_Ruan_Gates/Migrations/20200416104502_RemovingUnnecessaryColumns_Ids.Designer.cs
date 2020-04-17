@@ -4,14 +4,16 @@ using BD_Assessment_WebAPI_Ruan_Gates.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BD_Assessment_WebAPI_Ruan_Gates.Migrations
 {
     [DbContext(typeof(BatchContext))]
-    partial class BatchContextModelSnapshot : ModelSnapshot
+    [Migration("20200416104502_RemovingUnnecessaryColumns_Ids")]
+    partial class RemovingUnnecessaryColumns_Ids
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

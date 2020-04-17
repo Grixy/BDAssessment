@@ -1,4 +1,7 @@
-﻿using System;
+﻿using BD_Assessment_WebAPI_Ruan_Gates.Helpers;
+using BD_Assessment_WebAPI_Ruan_Gates.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,91 +9,157 @@ using System.Timers;
 
 namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 {
+
+	public class BatchAndNumberEventArgs : EventArgs
+	{
+		public BatchAndNumber BatchAndNumber { get; set; }
+	}
+
 	public class BatchesAndNumbersProcessor
 	{
-		public delegate void NumberGeneratorEventHandler(object source, EventArgs args);
+		public int numbertest = 0;
 
-		public event NumberGeneratorEventHandler NumberGenerated;
+		static BatchAndNumber batchAndNumber = new BatchAndNumber();
 
-		public async Task PerformBatchOperations (int batch, int numbers)
+		public async Task<BatchAndNumber> PerformBatchOperations(int batch)
 		{
+			var GeneratorManager = new GeneratorManager();
+			var MultiplierManager = new MultiplierManager();
 			var BatchesAndNumbersProcessor = new BatchesAndNumbersProcessor();
 
-			//var MultiplyService = new MultiplyService();
+			int remainingNumbers = 0;
 
-			BatchesAndNumbersProcessor.NumberGenerated += BatchesAndNumbersProcessor.OnNumberGenerated;
+			GeneratorManager.NumberGenerated += MultiplierManager.OnNumberGenerated;
+			MultiplierManager.NumberMultiplied += BatchesAndNumbersProcessor.OnNumberMultiplied;
 
-			await GeneratorManager(numbers);
+			//for (int i = 0; i < numbers; i++)
+			await GeneratorManager.Generate(batch);
 
-			//await MultiplierManager(randomNumber);
+			Console.WriteLine(""+numbertest);
+			return batchAndNumber;
 		}
 
-		private void test(object source, EventArgs args)
+		public void OnNumberMultiplied(object source, BatchAndNumberEventArgs e)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine("123" + e.BatchAndNumber.Batch + " " + e.BatchAndNumber.Number);
+			numbertest = e.BatchAndNumber.Number;
+			batchAndNumber.Batch = e.BatchAndNumber.Batch;
+			batchAndNumber.Number = e.BatchAndNumber.Number;
+			//using (var client = new HttpClient())
+
+			//var optionsBuilder = new DbContextOptionsBuilder<BatchContext>();
+			//optionsBuilder.UseSqlServer("DevConnection");
+
+			//using (BatchContext context = new BatchContext(optionsBuilder.Options))
+			//{
+
+			//	Batch batch = new Batch();
+			//	batch.BatchElements = new List<BatchElement>();
+			//	batch.GrandTotal = 444;
+
+			//	BatchElement batchElement = new BatchElement();
+			//	batchElement.Aggregate = 0;
+			//	batchElement.NumbersRemaining = 1;
+			//	batchElement.NumbersInBatch = new List<NumberInBatch>();
+
+			//	NumberInBatch numberInBatch = new NumberInBatch();
+			//	numberInBatch.Number = e.BatchAndNumber.Number;
+
+			//	batchElement.NumbersInBatch.Add(numberInBatch);
+			//	batch.BatchElements.Add(batchElement);
+
+			//	context.Add(batch);
+			//	await context.SaveChangesAsync();
+			//}
+
+			//ReturningValueForDb(batchAndNumber);
+
+			//NumberInBatch numberInBatch = new NumberInBatch();
+			//numberInBatch.Number = e.BatchAndNumber.Number;
+
+			//BatchElement batchElement = new BatchElement();
+			//batchElement.Aggregate = 0;
+			//batchElement.NumbersRemaining = 1;
+			//batchElement.NumbersInBatch = new List<NumberInBatch>();
+			//batchElement.NumbersInBatch.Add(numberInBatch);
+
+			//Batch batch = new Batch();
+			//batch.BatchElements = new List<BatchElement>();
+			//batch.GrandTotal = 444;
+
+			//DbContext.Batches.Add(batch);
+			//await _context.SaveChangesAsync();
 		}
 
-		public async Task GeneratorManager(int totalNumbers)
+		//public async Task ReturningValueForDb(BatchAndNumber batchAndNumber)
+		//{
+		//	OnReturningBatchElementForDb(batchAndNumber);
+		//}
+
+		//protected virtual void OnReturningBatchElementForDb(BatchAndNumber batchAndNumber)
+		//{
+		//	if (NumberMultiplied != null)
+		//		NumberMultiplied(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
+		//}
+	}
+
+	public class GeneratorManager
+	{
+		public event EventHandler<BatchAndNumberEventArgs> NumberGenerated;
+
+		public async Task Generate(int batch)
 		{
-			int randomNumber = RandomNumber(1, 100);
-			int randomDelay = RandomNumber(5000, 10000);
+			BatchAndNumber batchAndNumber = new BatchAndNumber();
+
+			int randomNumber = RandomWithinRange.RandomNumber(Global.RandomIntegerLowest, Global.RandomIntegerHighest);
+			int randomDelay = RandomWithinRange.RandomNumber(Global.DelayLowest, Global.DelayHighest, Global.DelayMultiplier);
+
+			batchAndNumber.Batch = batch;
+			batchAndNumber.Number = randomNumber;
 
 			await Task.Delay(randomDelay);
-			OnNumberGenerated();
+
+			OnNumberGenerated(batchAndNumber);
 		}
 
-		// Generate a random number between two numbers  
-		private static int RandomNumber(int min, int max)
-		{
-			Random random = new Random();
-			return random.Next(min, max);
-		}
-
-		protected virtual void OnNumberGenerated()
+		protected virtual void OnNumberGenerated(BatchAndNumber batchAndNumber)
 		{
 			if (NumberGenerated != null)
-				NumberGenerated(this, EventArgs.Empty);
-		}
-
-		public void OnNumberGenerated(object source, EventArgs e)
-		{
-			Console.WriteLine("123");
+				NumberGenerated(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
 		}
 	}
 
-	//public class MultiplyService
-	//{
-	//	public void OnNumberGenerated(object source, EventArgs e)
-	//	{
-	//		Console.WriteLine("123");
-	//	}
-	//}
+	public class MultiplierManager
+	{
+		public async void OnNumberGenerated(object source, BatchAndNumberEventArgs e)
+		{
+			Console.WriteLine("123" + e.BatchAndNumber.Batch + " " + e.BatchAndNumber.Number);
+
+			await Multiply(e.BatchAndNumber.Batch, e.BatchAndNumber.Number);
+		}
+
+		public event EventHandler<BatchAndNumberEventArgs> NumberMultiplied;
+
+		public async Task Multiply(int batch, int number)
+		{
+			BatchAndNumber batchAndNumber = new BatchAndNumber();
+
+			int multiplier = RandomWithinRange.RandomNumber(Global.MultiplierLowest, Global.MultiplierHighest);
+			int multipliedNumber = multiplier * number;
+			int randomDelay = RandomWithinRange.RandomNumber(Global.DelayLowest, Global.DelayHighest, Global.DelayMultiplier);
+			
+			batchAndNumber.Batch = batch;
+			batchAndNumber.Number = multipliedNumber;
+
+			await Task.Delay(randomDelay);
+
+			OnNumberMultiplied(batchAndNumber);
+		}
+
+		protected virtual void OnNumberMultiplied(BatchAndNumber batchAndNumber)
+		{
+			if (NumberMultiplied != null)
+				NumberMultiplied(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
+		}
+	}
 }
-
-
-
-
-//public static void GeneratorManager(int totalNumbers)
-//{
-//	Timer timer = new Timer(10000);
-//	timer.Elapsed += Timer_Elapsed;
-//	timer.Start();
-//	//Console.WriteLine(DateTime.Now);
-//}
-
-//public static void MultiplierManager(int numberToMultiply)
-//{
-
-//}
-
-//private static void CustomTimer(int timeSeconds)
-//{
-
-//}
-
-//private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
-//{
-//	DateTime dt = new DateTime();
-//	dt = DateTime.Now;
-//	Console.WriteLine(dt);
-//}

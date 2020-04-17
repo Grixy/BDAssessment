@@ -4,14 +4,16 @@ using BD_Assessment_WebAPI_Ruan_Gates.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BD_Assessment_WebAPI_Ruan_Gates.Migrations
 {
     [DbContext(typeof(BatchContext))]
-    partial class BatchContextModelSnapshot : ModelSnapshot
+    [Migration("20200416104405_RemovingUnnecessaryColumns")]
+    partial class RemovingUnnecessaryColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,6 +72,9 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Migrations
                     b.Property<int>("NumbersRemaining")
                         .HasColumnType("int");
 
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
                     b.HasKey("BatchId");
 
                     b.HasIndex("BatchRequestId");
@@ -85,6 +90,9 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("BatchElementBatchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BatchId")
                         .HasColumnType("int");
 
                     b.Property<int>("Number")

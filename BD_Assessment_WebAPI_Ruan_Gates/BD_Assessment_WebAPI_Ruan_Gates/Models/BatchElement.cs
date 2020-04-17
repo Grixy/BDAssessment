@@ -13,9 +13,6 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Models
 		public int BatchId { get; set; }
 
 		[Required]
-		public int RequestId { get; set; }
-
-		[Required]
 		public int Aggregate { get; set; }
 
 		[Required]
