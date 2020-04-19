@@ -80,16 +80,23 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Controllers
         [HttpPost]
         public async Task<ActionResult<BatchAndNumberInput>> PostBatchAndNumberInput(BatchAndNumberInput batchAndNumberInput)
         {
-            List<Task<BatchAndNumber>> listOfTasks = new List<Task<BatchAndNumber>>();
+            
             int totalBatches = Int32.Parse(batchAndNumberInput.Batches);
-            ProcessorAsync processorAsync = new ProcessorAsync();
+            List<Task> listOfTasks = new List<Task>();
 
             for (int z = 1; z <= totalBatches; z++)
             {
-                listOfTasks.Add(processorAsync.PerformBatchOperations(z));
+                BatchesAndNumbersProcessor processor = new BatchesAndNumbersProcessor();
+                BatchAndNumber batchAndNumber = new BatchAndNumber
+                {
+                    Batch = z,
+                    //In this case, our number will indicate the total numbers (or 'number-of-numbers') in this batch.
+                    Number = int.Parse(batchAndNumberInput.Numbers)
+                };
+                listOfTasks.Add(processor.PerformBatchOperations(batchAndNumber));
             }
 
-            var check = await Task.WhenAll<BatchAndNumber>(listOfTasks);
+            await Task.WhenAll(listOfTasks);
 
             _context.BatchAndNumberInput.Add(batchAndNumberInput);
             await _context.SaveChangesAsync();

@@ -11,16 +11,14 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 {
 	public class ProcessorAsync
 	{
-		public async Task<BatchAndNumber> PerformBatchOperations(int batch)
-		{
-			var GeneratorManager = new GeneratorManager();
+		//public async Task<BatchAndNumber> PerformBatchOperations(int batch, int numbers)
+		//{			
+		//	await Generate(batch, numbers);
+						
+		//	return b;
+		//}
 
-			BatchAndNumber b = await Generate(batch);
-
-			return b;
-		}
-
-		public async Task<BatchAndNumber> Generate(int batch)
+		public async Task Generate(int batch, int numbers)
 		{
 			BatchAndNumber batchAndNumber = new BatchAndNumber();
 
@@ -32,11 +30,10 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			batchAndNumber.Number = randomNumber;
 			batchAndNumber.Batch = batch;
 
-			var MultiplierManager = new MultiplierManager();
-			BatchAndNumber batchAndNumberTask = await Multiply(batchAndNumber);
-			//BatchAndNumber batchAndNumberFinal = batchAndNumberTask.Result;
+			//var MultiplierManager = new MultiplierManager();
+			//BatchAndNumber batchAndNumberTask = await Multiply(batchAndNumber);
 
-			return batchAndNumberTask;
+			//return batchAndNumberTask;
 
 		}
 

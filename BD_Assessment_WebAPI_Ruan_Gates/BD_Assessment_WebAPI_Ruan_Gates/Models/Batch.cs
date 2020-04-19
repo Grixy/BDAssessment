@@ -14,6 +14,8 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Models
 
 		public int GrandTotal { get; set; }
 
+		public BatchAndNumberInput BatchAndNumberInput { get; set; }
+
 		public IList<BatchElement> BatchElements { get; set; }
 	}
 
