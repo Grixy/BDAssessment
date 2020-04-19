@@ -1,3 +1,4 @@
+import { NumbersAndBatchesService } from './../../shared/numbers-and-batches.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -8,10 +9,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NumbersAndBatchesGridComponent implements OnInit {
 
-  constructor() { }
+  constructor(public service: NumbersAndBatchesService) { }
 
-  ngOnInit(): void {
-    // alert("initgrid");
+  ngOnInit() {
+    this.service.refreshList();
   }
 
+  populateForm(selectedRecord) {
+    this.service.formData = Object.assign({}, selectedRecord);
+  }
+  
+  onDelete(PMId) {
+    if (confirm('Are you sure to delete this record ?')) {
+      this.service.deleteNumbersAndBatches(PMId)
+        .subscribe(res => {
+          this.service.refreshList();
+        },
+        err => { console.log(err); })
+    }
+  }
 }

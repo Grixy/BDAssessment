@@ -1,4 +1,6 @@
-﻿using BD_Assessment_WebAPI_Ruan_Gates.Helpers;
+﻿//using BD_Assessment_WebAPI_Ruan_Gates.DataLayer;
+using BD_Assessment_WebAPI_Ruan_Gates.Datalayer;
+using BD_Assessment_WebAPI_Ruan_Gates.Helpers;
 using BD_Assessment_WebAPI_Ruan_Gates.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,60 +15,52 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 	public class BatchAndNumberEventArgs : EventArgs
 	{
 		public BatchAndNumber BatchAndNumber { get; set; }
+		public BatchAndNumberInput BatchAndNumberInput { get; set; }
 	}
+
+
+
 
 	public class BatchesAndNumbersProcessor
 	{
+		public event EventHandler<BatchAndNumberEventArgs> NumberGenerated;
+		public event EventHandler<BatchAndNumberEventArgs> NumberMultiplied;
 
-		ProcessorWorkers processorWorkers = new ProcessorWorkers();
-		BatchAndNumber batchAndNumber = new BatchAndNumber();
-
-		public async Task PerformBatchOperations(BatchAndNumber receivedBatchAndNumber)
+		public async Task PerformBatchOperations(BatchAndNumberInput receivedBatchAndNumber)
 		{
-
-			processorWorkers.NumberGenerated += OnNumberFinishedGenerating;
-			processorWorkers.NumberMultiplied += OnNumberFinishedMultiplying;
+			
+			NumberGenerated += OnNumberFinishedGeneratingAsync;
+			NumberMultiplied += OnNumberFinishedMultiplyingAsync;
 
 			List<Task> listOfTasks = new List<Task>();
 
-			for (int i = 1; i <= receivedBatchAndNumber.Number; i++)
+			for (int i = 1; i <= int.Parse(receivedBatchAndNumber.Numbers); i++)
 			{
-				ProcessorWorkers p = new ProcessorWorkers();
-				listOfTasks.Add(p.PerformanceLogic(receivedBatchAndNumber));
+				listOfTasks.Add(PerformanceLogic(receivedBatchAndNumber,i));
 			}
 
 			await Task.WhenAll(listOfTasks);
 		}
 
-		public void OnNumberFinishedGenerating(object source, BatchAndNumberEventArgs e)
+		private async Task PerformanceLogic (BatchAndNumberInput inputDetails, int batch)
 		{
-			batchAndNumber.Batch = e.BatchAndNumber.Batch;
-			batchAndNumber.Number = e.BatchAndNumber.Number;
+			await Generate(inputDetails, batch);
 		}
 
-		public void OnNumberFinishedMultiplying(object source, BatchAndNumberEventArgs e)
+		public async void OnNumberFinishedGeneratingAsync(object source, BatchAndNumberEventArgs e)
 		{
-
+			//BatchAndNumber batchAndNumber = new BatchAndNumber
+			//{
+			//	Batch = e.BatchAndNumber.Batch,
+			//	Number = e.BatchAndNumber.Number
+			//};
+			await Multiply(e.BatchAndNumberInput, e.BatchAndNumber);
 		}
 
-	}
-
-	public class ProcessorWorkers
-	{
-		public event EventHandler<BatchAndNumberEventArgs> NumberGenerated;
-		public event EventHandler<BatchAndNumberEventArgs> NumberMultiplied;
-		BatchAndNumber batchAndNumber = new BatchAndNumber();
-
-		public async Task PerformanceLogic(BatchAndNumber receivedBatchAndNumber)
+		public async Task Generate(BatchAndNumberInput inputDetails, int batch)
 		{
-			await Generate(receivedBatchAndNumber.Batch);
-			await Multiply(batchAndNumber);
+			BatchAndNumber batchAndNumber = new BatchAndNumber();
 
-			BatchAndNumber bbbbbbbbbbbbbbbbb = batchAndNumber;
-		}
-
-		public async Task Generate(int batch)
-		{
 			int randomNumber = RandomWithinRange.RandomNumber(Global.RandomIntegerLowest, Global.RandomIntegerHighest);
 			int randomDelay = RandomWithinRange.RandomNumber(Global.DelayLowest, Global.DelayHighest, Global.DelayMultiplier);
 
@@ -75,27 +69,38 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 
 			await Task.Delay(5000);
 
-			OnNumberGenerated(batchAndNumber);
+			OnNumberGenerated(inputDetails, batchAndNumber);
 		}
 
-		protected virtual void OnNumberGenerated(BatchAndNumber batchAndNumber)
+		protected virtual void OnNumberGenerated(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
 		{
 			NumberGenerated?.Invoke(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
 		}
 
-		public async Task Multiply(BatchAndNumber batchAndNumber)
+		public async void OnNumberFinishedMultiplyingAsync(object source, BatchAndNumberEventArgs e)
+		{
+			NumbersAndBatchesData n = new NumbersAndBatchesData();
+			BatchAndNumberFullInfo saveData = new BatchAndNumberFullInfo
+			{
+				BatchAndNumber = e.BatchAndNumber,
+				BatchAndNumberInputDetails = e.BatchAndNumberInput
+			};
+
+			await n.WriteBatchAndNumberToDatabase(saveData);
+		}
+
+		public async Task Multiply(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
 		{
 			int multiplier = RandomWithinRange.RandomNumber(Global.MultiplierLowest, Global.MultiplierHighest);
 			int multipliedNumber = multiplier * batchAndNumber.Number;
 			int randomDelay = RandomWithinRange.RandomNumber(Global.DelayLowest, Global.DelayHighest, Global.DelayMultiplier);
 			batchAndNumber.Number = multipliedNumber;
-
 			await Task.Delay(5000);
 
-			OnNumberMultiplied(batchAndNumber);
+			OnNumberMultiplied(inputDetails, batchAndNumber);
 		}
 
-		protected virtual void OnNumberMultiplied(BatchAndNumber batchAndNumber)
+		protected virtual void OnNumberMultiplied(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
 		{
 			NumberMultiplied?.Invoke(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
 		}

@@ -16,6 +16,9 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Models
 		public int Aggregate { get; set; }
 
 		[Required]
+		public int BatchNumber { get; set; }
+
+		[Required]
 		public int NumbersRemaining { get; set; }
 
 		//navigation properties

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using BD_Assessment_WebAPI_Ruan_Gates.Models;
 using BD_Assessment_WebAPI_Ruan_Gates.Processors;
 
-namespace BD_Assessment_WebAPI_Ruan_Gates.Controllers
+namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -93,7 +93,7 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Controllers
                     //In this case, our number will indicate the total numbers (or 'number-of-numbers') in this batch.
                     Number = int.Parse(batchAndNumberInput.Numbers)
                 };
-                listOfTasks.Add(processor.PerformBatchOperations(batchAndNumber));
+                listOfTasks.Add(processor.PerformBatchOperations(batchAndNumberInput));
             }
 
             await Task.WhenAll(listOfTasks);

@@ -1,1 +1,10 @@
-<p>numbers-and-batches-grid works!</p>
+<table class="table table-hover">
+    <tr *ngFor="let pd of service.list">
+        <td>{{pd.NumberId}}</td>
+        <td>{{pd.Number}}</td>
+        <td (click)="populateForm(pd)">...</td>
+        <td>
+            <i class="far fa-trash-alt fa-lg text-danger" (click)="onDelete(pd.NumberId)"></i>
+          </td>
+    </tr>
+</table>

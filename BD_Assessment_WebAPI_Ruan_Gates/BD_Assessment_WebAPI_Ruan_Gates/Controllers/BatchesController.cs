@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BD_Assessment_WebAPI_Ruan_Gates.Models;
 
-namespace BD_Assessment_WebAPI_Ruan_Gates.Controllers
+namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
 {
     [Route("api/[controller]")]
     [ApiController]

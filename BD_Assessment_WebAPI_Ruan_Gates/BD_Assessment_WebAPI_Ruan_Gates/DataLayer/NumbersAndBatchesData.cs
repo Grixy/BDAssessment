@@ -8,48 +8,54 @@ using Microsoft.EntityFrameworkCore;
 using BD_Assessment_WebAPI_Ruan_Gates.Models;
 using BD_Assessment_WebAPI_Ruan_Gates.Processors;
 
-namespace BD_Assessment_WebAPI_Ruan_Gates.DataLayer
+namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
 {
+	[Route("api/[controller]")]
+	[ApiController]
 	public class NumbersAndBatchesData : ControllerBase
 	{
-		private readonly BatchContext _context;
+		private BatchContext _context;
+
+		public NumbersAndBatchesData()
+		{
+		}
 
 		public NumbersAndBatchesData(BatchContext context)
 		{
 			_context = context;
 		}
 
-		public async Task<ActionResult<BatchAndNumberInput>> WriteBatchAndNumberToDatabase (BatchAndNumberInput batchAndNumber)
+		public async Task WriteBatchAndNumberToDatabase(BatchAndNumberFullInfo batchAndNumberFullInfo)
 		{
+			var optionsBuilder = new DbContextOptionsBuilder<BatchContext>();
+			optionsBuilder.UseSqlServer("Server=(local)\\sqlexpress;Database=RuanGatesBDAssessmentDB;Trusted_Connection=True;MultipleActiveResultSets=True;");
 
-			var usr = new Batch();
+			var batch = new Batch();
 
-			usr.BatchElements = new List<BatchElement>();
-			usr.BatchAndNumberInput = new BatchAndNumberInput();
-			usr.BatchAndNumberInput.Batches = "9";
-			usr.BatchAndNumberInput.Numbers = "9";
+			batch.BatchElements = new List<BatchElement>();
+			batch.BatchAndNumberInput = new BatchAndNumberInput();
+			batch.BatchAndNumberInput.Batches = "00";
+			batch.BatchAndNumberInput.Numbers = "00";
 
-			BatchElement b = new BatchElement();
-			b.NumbersRemaining = 4;
-			b.Aggregate = 12;
-			b.NumbersInBatch = new List<NumberInBatch>();
-			
+			BatchElement batchElement = new BatchElement();
+			batchElement.BatchNumber = batchAndNumberFullInfo.BatchAndNumber.Batch;
+			batchElement.NumbersRemaining = 4;
+			batchElement.Aggregate = 12;
+			batchElement.NumbersInBatch = new List<NumberInBatch>();
 
-			NumberInBatch n = new NumberInBatch();
-			n.Number = 3;
+			NumberInBatch number = new NumberInBatch();
+			number.Number = batchAndNumberFullInfo.BatchAndNumber.Number;
 
-			b.NumbersInBatch.Add(n);
-			usr.BatchElements.Add(b);
+			batchElement.NumbersInBatch.Add(number);
+			batch.BatchElements.Add(batchElement);
 
-			usr.GrandTotal = 99;
+			batch.GrandTotal = 99;
 
-			_context.Batches.Add(usr);
-			await _context.SaveChangesAsync();
-
-			_context.BatchAndNumberInput.Add(batchAndNumber);
-			await _context.SaveChangesAsync();
-
-			return CreatedAtAction("GetBatchAndNumberInput", new { id = batchAndNumber.RequestId }, batchAndNumber);
+			using (var ctx = new BatchContext(optionsBuilder.Options))
+			{
+				ctx.Batches.Add(batch);
+				await ctx.SaveChangesAsync();
+			}
 		}
 	}
 }

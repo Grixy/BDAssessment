@@ -1,4 +1,5 @@
 import { NumbersAndBatches } from './numbers-and-batches.model';
+import { Numbers } from './grid-elements.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 
@@ -9,7 +10,7 @@ export class NumbersAndBatchesService {
 
   formData: NumbersAndBatches;
   readonly rootURL = 'http://localhost:56493/api';
-  list : NumbersAndBatches[];
+  list: Numbers[];
 
   constructor(private http: HttpClient) { }
 
@@ -21,13 +22,13 @@ export class NumbersAndBatchesService {
   // putNumbersAndBatches() {
   //   return this.http.put(this.rootURL + '/NumbersAndBatches/'+ this.formData.PMId, this.formData);
   // }
-  // deleteNumbersAndBatches(id) {
-  //   return this.http.delete(this.rootURL + '/NumbersAndBatches/'+ id);
-  // }
+  deleteNumbersAndBatches(id) {
+    return this.http.delete(this.rootURL + '/NumbersAndBatches/'+ id);
+  }
 
   refreshList(){
-    this.http.get(this.rootURL + '/BatchAndNumberInputs')
+    this.http.get(this.rootURL + '/NumberInBatches')
     .toPromise()
-    .then(res => this.list = res as NumbersAndBatches[]);
+    .then(res => this.list = res as Numbers[]);
   }
 }

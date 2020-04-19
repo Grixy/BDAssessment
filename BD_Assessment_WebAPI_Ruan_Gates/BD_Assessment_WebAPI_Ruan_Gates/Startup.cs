@@ -28,8 +28,8 @@ namespace BD_Assessment_WebAPI_Ruan_Gates
 		{
 			services.AddControllers();
 
-			services.AddDbContext<BatchContext>(optionns =>
-	optionns.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
+			services.AddDbContext<BatchContext>(options =>
+	options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
 
 			//remove default json formatting
 			services.AddControllers().AddJsonOptions(options =>
