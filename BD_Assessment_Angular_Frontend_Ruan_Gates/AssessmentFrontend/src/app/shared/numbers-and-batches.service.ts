@@ -1,5 +1,7 @@
 import { NumbersAndBatches } from './numbers-and-batches.model';
-import { Numbers } from './grid-elements.model';
+import { Numbers } from './number.model';
+import { Batch } from './batch.model';
+import { BatchCollection } from './batch-collection.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 
@@ -10,13 +12,14 @@ export class NumbersAndBatchesService {
 
   formData: NumbersAndBatches;
   readonly rootURL = 'http://localhost:56493/api';
-  list: Numbers[];
+  numberslist: BatchCollection[];
 
   constructor(private http: HttpClient) { }
 
   postNumbersAndBatches() {
     // alert("POST");
     return this.http.post(this.rootURL + '/BatchAndNumberInputs', this.formData);
+    
   }
 
   // putNumbersAndBatches() {
@@ -27,8 +30,21 @@ export class NumbersAndBatchesService {
   }
 
   refreshList(){
-    this.http.get(this.rootURL + '/NumberInBatches')
+    // this.http.get(this.rootURL + '/NumberInBatches')
+    // .toPromise()
+    // .then(res => this.numberslist = res as Numbers[]);
+    var elementsList: Batch[];
+    
+    this.http.get(this.rootURL + '/Batches/' + 2)
     .toPromise()
-    .then(res => this.list = res as Numbers[]);
+    .then(res => this.numberslist = res as BatchCollection[]);
+
+
+console.log(this.numberslist);
+    // this.http.get(this.rootURL + '/NumberInBatches')
+    // .toPromise()
+    // .then(res => this.numberslist = res as Numbers[]);
   }
+
+  
 }

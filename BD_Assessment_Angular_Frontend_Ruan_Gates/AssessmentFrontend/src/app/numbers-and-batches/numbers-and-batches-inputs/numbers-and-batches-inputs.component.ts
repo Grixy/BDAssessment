@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NumbersAndBatchesService } from './../../shared/numbers-and-batches.service';
 import { NgForm } from '@angular/forms';
+import { Http, Response } from ‘@angular/http’;
 
 @Component({
   selector: 'app-numbers-and-batches-inputs',
@@ -33,16 +34,16 @@ export class NumbersAndBatchesInputsComponent implements OnInit {
     // console.log(form);
 
     if (this.service.formData.RequestId == 0)
-      this.insertRecord(form);
-
+      var x = this.insertRecord(form);
+debugger
     // else
     //   this.updateRecord(form);
   }
 
   insertRecord(form: NgForm) {
+
     this.service.postNumbersAndBatches().subscribe(
       res => {
-        debugger;
         this.resetForm(form);
         this.toastr.success('Submitted successfully', 'Numbers and Batches Submission');
         this.service.refreshList();
@@ -51,6 +52,7 @@ export class NumbersAndBatchesInputsComponent implements OnInit {
         debugger;
         console.log(err);
       }
+      
     )
   }
   

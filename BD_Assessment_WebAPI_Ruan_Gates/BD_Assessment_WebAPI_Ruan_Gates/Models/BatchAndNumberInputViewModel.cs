@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 
 namespace BD_Assessment_WebAPI_Ruan_Gates.Models
 {
-	public class Batch
+	public class BatchAndNumberInputViewModel
 	{
 		[Key]
 		public int RequestId { get; set; }
 
-		public int CollectionId { get; set; }
+		[Required]
+		[Column(TypeName = "varchar(2)")]
+		public string Batches { get; set; }
 
-		public int GrandTotal { get; set; }
-
-		public BatchAndNumberInput BatchAndNumberInput { get; set; }
-
-		public IList<BatchElement> BatchElements { get; set; }
+		[Required]
+		[Column(TypeName = "varchar(2)")]
+		public string Numbers { get; set; }
 	}
-
-
 }

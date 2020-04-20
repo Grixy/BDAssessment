@@ -12,7 +12,6 @@ export class NumbersAndBatchesGridComponent implements OnInit {
   constructor(public service: NumbersAndBatchesService) { }
 
   ngOnInit() {
-    this.service.refreshList();
   }
 
   populateForm(selectedRecord) {

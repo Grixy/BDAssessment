@@ -24,21 +24,96 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Batch>>> GetBatches()
         {
-            return await _context.Batches.ToListAsync();
+            //var data = await _context.Batches
+            //    .Include(BatchAndNumberInput => BatchAndNumberInput.BatchAndNumberInput)
+            //    .Include(BatchElements => BatchElements.BatchElements)
+            //    .ThenInclude(NumberInBatch => NumberInBatch.NumbersInBatch)
+            //    .ToListAsync();
+
+
+
+            return await _context.Batches
+                .Include(BatchAndNumberInput => BatchAndNumberInput.BatchAndNumberInput)
+                .Include(BatchElements => BatchElements.BatchElements)
+                .ThenInclude(NumberInBatch => NumberInBatch.NumbersInBatch)
+                .ToListAsync();
         }
 
         // GET: api/Batches/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Batch>> GetBatch(int id)
         {
-            var batch = await _context.Batches.FindAsync(id);
+            var data = await _context.Batches
+                .Include(BatchAndNumberInput => BatchAndNumberInput.BatchAndNumberInput)
+                .Include(BatchElements => BatchElements.BatchElements)
+                .ThenInclude(NumberInBatch => NumberInBatch.NumbersInBatch)
+                .Where(x => x.CollectionId == 209)
+                .ToListAsync();
 
-            if (batch == null)
+            if (data == null)
             {
                 return NotFound();
             }
 
-            return batch;
+            //It seems that EF is quite prone to circular loops when returning relational data. I am going to parse and return through ViewModels to prevent this on the client-side.
+            List<BatchViewModel> collection = new List<BatchViewModel>();
+            foreach (Batch b in data)
+            {
+                BatchAndNumberInputViewModel batchAndNumberInput = new BatchAndNumberInputViewModel
+                {
+                    RequestId = b.BatchAndNumberInput.RequestId,
+                    Batches = b.BatchAndNumberInput.Batches,
+                    Numbers = b.BatchAndNumberInput.Numbers
+                };
+
+                List<BatchElementViewModel> batchElementList = new List<BatchElementViewModel>();
+                foreach (BatchElement batchElement in b.BatchElements)
+                {
+
+                    List<NumberInBatchViewModel> numberInBatchViewModelList = new List<NumberInBatchViewModel>();
+                    foreach (NumberInBatch numberInBatch in batchElement.NumbersInBatch)
+                    {
+                        NumberInBatchViewModel numberInBatchViewModel = new NumberInBatchViewModel
+                        {
+                            Number = numberInBatch.Number,
+                            NumberId = numberInBatch.NumberId
+                        };
+                        numberInBatchViewModelList.Add(numberInBatchViewModel);
+                    }
+
+                    BatchElementViewModel batchElementViewModel = new BatchElementViewModel
+                    {
+                        BatchId = batchElement.BatchId,
+                        Aggregate = batchElement.Aggregate,
+                        BatchNumber = batchElement.BatchNumber,
+                        NumbersRemaining = batchElement.NumbersRemaining,
+                        NumbersInBatch = numberInBatchViewModelList
+                    };
+
+                    batchElementList.Add(batchElementViewModel);
+                }
+
+                BatchViewModel batchViewModel = new BatchViewModel
+                {
+                    RequestId = b.RequestId,
+                    GrandTotal = b.GrandTotal,
+                    BatchAndNumberInput = batchAndNumberInput,
+                    BatchElements = batchElementList
+                };
+
+                collection.Add(batchViewModel);
+            }
+
+            return Ok(collection);
+
+            //var batch = await _context.Batches.FindAsync(id);
+
+            //if (batch == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //return batch;
         }
 
         // PUT: api/Batches/5

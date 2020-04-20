@@ -16,6 +16,7 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
 	{
 		private BatchContext _context;
 
+		//Shouldn't need a default constructor without context, but I am doing something wrong with Dependency Injection.
 		public NumbersAndBatchesData()
 		{
 		}
@@ -27,6 +28,8 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
 
 		public async Task WriteBatchAndNumberToDatabase(BatchAndNumberFullInfo batchAndNumberFullInfo)
 		{
+			//I am given to understand that this is an antequated way to do this. I agree. I am however struggling to utilise the dependency injection native to EF Core, as at the top of this page.
+			//Right now, I just want to focus on functionality, but please be aware that I know this is not ideal.
 			var optionsBuilder = new DbContextOptionsBuilder<BatchContext>();
 			optionsBuilder.UseSqlServer("Server=(local)\\sqlexpress;Database=RuanGatesBDAssessmentDB;Trusted_Connection=True;MultipleActiveResultSets=True;");
 
@@ -34,8 +37,9 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Datalayer
 
 			batch.BatchElements = new List<BatchElement>();
 			batch.BatchAndNumberInput = new BatchAndNumberInput();
-			batch.BatchAndNumberInput.Batches = "00";
-			batch.BatchAndNumberInput.Numbers = "00";
+			batch.BatchAndNumberInput.Batches = batchAndNumberFullInfo.BatchAndNumberInputDetails.Batches;
+			batch.BatchAndNumberInput.Numbers = batchAndNumberFullInfo.BatchAndNumberInputDetails.Numbers;
+			batch.CollectionId = batchAndNumberFullInfo.BatchAndNumberInputDetails.RequestId;
 
 			BatchElement batchElement = new BatchElement();
 			batchElement.BatchNumber = batchAndNumberFullInfo.BatchAndNumber.Batch;

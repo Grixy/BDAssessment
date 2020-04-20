@@ -34,6 +34,8 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 
 			List<Task> listOfTasks = new List<Task>();
 
+			//This is the second splitting point for our logic. While this means more db calls later when trying to keep track of our aggregate, it ultimately reduces our time,
+			//Since unique numbers are now also generated asyncronously, as opposed to just batches themselves.
 			for (int i = 1; i <= int.Parse(receivedBatchAndNumber.Numbers); i++)
 			{
 				listOfTasks.Add(PerformanceLogic(receivedBatchAndNumber,i));
@@ -42,22 +44,20 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			await Task.WhenAll(listOfTasks);
 		}
 
+		//If we want to change the logic followed by the processor, this is our entrypoint to do so.
 		private async Task PerformanceLogic (BatchAndNumberInput inputDetails, int batch)
 		{
-			await Generate(inputDetails, batch);
+			await GeneratorManager(inputDetails, batch);
 		}
 
+		//Our GeneratorManager event result.
 		public async void OnNumberFinishedGeneratingAsync(object source, BatchAndNumberEventArgs e)
 		{
-			//BatchAndNumber batchAndNumber = new BatchAndNumber
-			//{
-			//	Batch = e.BatchAndNumber.Batch,
-			//	Number = e.BatchAndNumber.Number
-			//};
-			await Multiply(e.BatchAndNumberInput, e.BatchAndNumber);
+			await MultiplierManager(e.BatchAndNumberInput, e.BatchAndNumber);
 		}
 
-		public async Task Generate(BatchAndNumberInput inputDetails, int batch)
+		//Generate a random number and fire an event with its results.
+		public async Task GeneratorManager(BatchAndNumberInput inputDetails, int batch)
 		{
 			BatchAndNumber batchAndNumber = new BatchAndNumber();
 
@@ -72,11 +72,13 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			OnNumberGenerated(inputDetails, batchAndNumber);
 		}
 
+		//Our GeneratorManager event.
 		protected virtual void OnNumberGenerated(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
 		{
-			NumberGenerated?.Invoke(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
+			NumberGenerated?.Invoke(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber, BatchAndNumberInput = inputDetails });
 		}
 
+		//Our MultiplierManager event result.
 		public async void OnNumberFinishedMultiplyingAsync(object source, BatchAndNumberEventArgs e)
 		{
 			NumbersAndBatchesData n = new NumbersAndBatchesData();
@@ -89,7 +91,8 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			await n.WriteBatchAndNumberToDatabase(saveData);
 		}
 
-		public async Task Multiply(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
+		//Receive a number and multiply it by a random multiple.
+		public async Task MultiplierManager(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
 		{
 			int multiplier = RandomWithinRange.RandomNumber(Global.MultiplierLowest, Global.MultiplierHighest);
 			int multipliedNumber = multiplier * batchAndNumber.Number;
@@ -100,9 +103,10 @@ namespace BD_Assessment_WebAPI_Ruan_Gates.Processors
 			OnNumberMultiplied(inputDetails, batchAndNumber);
 		}
 
+		//Our MultiplierManager event.
 		protected virtual void OnNumberMultiplied(BatchAndNumberInput inputDetails, BatchAndNumber batchAndNumber)
 		{
-			NumberMultiplied?.Invoke(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber });
+			NumberMultiplied?.Invoke(this, new BatchAndNumberEventArgs() { BatchAndNumber = batchAndNumber, BatchAndNumberInput = inputDetails });
 		}
 	}
 }

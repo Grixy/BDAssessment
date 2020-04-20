@@ -9,6 +9,8 @@ import { NumbersAndBatchesInputsComponent } from './numbers-and-batches/numbers-
 import { ToastrModule } from 'ngx-toastr';
 import { HttpClientModule } from '@angular/common/http';
 import { NumbersAndBatchesService } from './shared/numbers-and-batches.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   declarations: [
@@ -22,7 +24,8 @@ import { NumbersAndBatchesService } from './shared/numbers-and-batches.service';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    BrowserAnimationsModule
   ],
   providers: [NumbersAndBatchesService],
   bootstrap: [AppComponent]
